@@ -4,6 +4,7 @@ const express = require('express');
 const Slapp = require('slapp');
 const ConvoStore = require('slapp-convo-beepboop');
 const Context = require('slapp-context-beepboop');
+const AwsModule = require('./libs/AwsDynamicDb.js');
 
 // use `PORT` env var on Beep Boop - default to 3000 locally
 let port = process.env.PORT || 3000;
@@ -14,6 +15,7 @@ let slapp = Slapp({
     convo_store: ConvoStore(),
     context: Context()
 });
+
 
 
 let HELP_TEXT = `
@@ -117,6 +119,9 @@ slapp.message('.*', ['direct_mention', 'direct_message'], (msg) => {
 let server = slapp.attachToExpress(express());
 
 // start http server
+
+// Setup AWS connection
+AwsModule.createTable();
 server.listen(port, (err) => {
   if (err) {
     return console.error(err)
