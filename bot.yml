@@ -1,5 +1,5 @@
 name: teamdesk
-description: ☝️☝️ Check out the README ☝️☝️ in the repo for setup instructions. By the way, this is just the description in the bot.yml file - feel free to change it 😉
+description: A bot for interacting with teamwork Desk.
 avatar: .beepboop/avatar.png
 config:
   - name: AWS_ACCESS_KEY_ID
