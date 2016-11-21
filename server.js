@@ -21,7 +21,7 @@ let slapp = Slapp({
 let HELP_TEXT = `
 I will respond to the following messages:
 \`help\` - to see this message.
-\`hi\` - to demonstrate a conversation that tracks state.
+\`configure\` - to connect you to your teamwork desk application
 \`thanks\` - to demonstrate a simple response.
 \`<type-any-other-text>\` - to demonstrate a random emoticon response, some of the time :wink:.
 \`attachment\` - to see a Slack attachment message.
@@ -35,6 +35,43 @@ I will respond to the following messages:
 slapp.message('help', ['mention', 'direct_message'], (msg) => {
   msg.say(HELP_TEXT)
 });
+// Configure
+slapp
+    .message('^(config)$', ['direct_mention', 'direct_message'], (msg) =>{
+    msg
+        .say('Okay, lets begin. What it your teamwork desk team name?')
+        .route('set-team-name')
+})
+    .route('set-team-name',(msg,state) => {
+        let text = (msg.body.event && msg.body.event.text) || '';
+
+        // user may not have typed text as their next action, ask again and re-route
+        if (!text) {
+            return msg
+                .say("Whoops, still waiting for your team name")
+                .say('What is your team name?')
+                .route('set-team-name', state)
+        }
+        state.teamName = text;
+
+        msg
+            .say(`Ok then. whats your API key?`)
+            .route('api-key', state)
+
+    })
+    .route('api-key',(msg, state) => {
+        let text = (msg.body.event && msg.body.event.text) || '';
+        // user may not have typed text as their next action, ask again and re-route
+        if (!text) {
+            return msg
+                .say("can you please provide your api key?.")
+                .route('api-key', state)
+        }
+        state.apiKey = text;
+        msg
+            .say(`Here is what I trying to use to connect with : \`\`\`${JSON.stringify(state)}\`\`\``);
+
+    });
 
 // "Conversation" flow that tracks state - kicks off when user says hi, hello or hey
 slapp
