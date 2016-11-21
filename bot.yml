@@ -1,6 +1,16 @@
 name: teamdesk
 description: ☝️☝️ Check out the README ☝️☝️ in the repo for setup instructions. By the way, this is just the description in the bot.yml file - feel free to change it 😉
 avatar: .beepboop/avatar.png
+config:
+  - name: AWS_ACCESS_KEY_ID
+    friendly_name: AWS Access key ID
+    info: Aws access key for DynanmicDB
+    type: secret
+    - name: AWS_SECRET_ACCESS_KEY
+    friendly_name: AWS Secret Access Key
+    type: secret
+
+
 slackscopes:
   - bot
   - commands
