@@ -11,7 +11,7 @@ Once you've created a new [Beep Boop](bb) project with this repo, go to your pro
 Follow the steps laid out in the wizard. You'll want to enable **Event Subscriptions** on your Slack App using the `URL` provided and add subscriptions for the following **Bot Events**:
 
 + `message.channels`
-+ `message.im`
++ `message.im`ddd
 
 ### 🔥 it up
 
