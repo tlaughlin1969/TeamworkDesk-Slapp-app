@@ -1,14 +1,63 @@
 let AWS = require("aws-sdk");
+const tableName = "SlackTeamdesk";
+
 let AwsDynamicDb = function () {
 };
+AwsDynamicDb.prototype.getSlackTeamDataFromMsg = function (msg,callback) {
+    AWS.config.update({
+        region: "us-east-2"
+    });
+    let docClient = new AWS.DynamoDB.DocumentClient();
+    let params;
+    params = {
+        TableName: tableName,
+        Key: {
+            "teamId": msg.meta.team_id
+        }
+    };
+    docClient.get(params, function(err, data) {
+        if (err) {
+            console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
+            return callback(err,null);
+        } else {
+            console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
+            return callback(null,data);
+        }
+    });
+};
+AwsDynamicDb.prototype.CreateTeam = function(msg,data) {
+    AWS.config.update({
+        region: "us-east-2"
+    });
+    let docClient = new AWS.DynamoDB.DocumentClient();
+   //let dynamodb = new AWS.DynamoDB();
 
+
+    let params;
+    params = {
+        TableName: tableName,
+        Item: {
+            "teamId": msg.meta.team_id,
+            "data": data
+        }
+    };
+
+
+    console.log("Adding a new item...");
+    docClient.put(params, function(err, data) {
+        if (err) {
+            console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
+        } else {
+            console.log("Added item:", JSON.stringify(data, null, 2));
+        }
+    });
+};
 
 AwsDynamicDb.prototype.createTable = function () {
     AWS.config.update({
         region: "us-east-2"
     });
     let dynamodb = new AWS.DynamoDB();
-    const tableName = "SlackTeamdesk";
     let params = {
         TableName: tableName,
         KeySchema: [

@@ -52,7 +52,7 @@ slapp
                 .say('What is your team name?')
                 .route('set-team-name', state)
         }
-        state.teamName = text;
+        state.deskTeamName = text;
 
         msg
             .say(`Ok then. whats your API key?`)
@@ -67,10 +67,10 @@ slapp
                 .say("can you please provide your api key?.")
                 .route('api-key', state)
         }
-        state.apiKey = text;
+        state.deskApiKey = text;
         msg
             .say(`Here is what I trying to use to connect with : \`\`\`${JSON.stringify(state)}\`\`\``);
-
+        AwsModule.CreateTeam(msg,state)
     });
 
 // "Conversation" flow that tracks state - kicks off when user says hi, hello or hey
