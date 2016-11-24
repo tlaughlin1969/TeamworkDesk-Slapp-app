@@ -5,6 +5,7 @@ const Slapp = require('slapp');
 const ConvoStore = require('slapp-convo-beepboop');
 const Context = require('slapp-context-beepboop');
 const AwsModule = require('./libs/AwsDynamicDb.js');
+const TeamWorkDesk = require('./libs/TeamWorkDesk.js');
 const _ = require('lodash');
 // use `PORT` env var on Beep Boop - default to 3000 locally
 let port = process.env.PORT || 3000;
@@ -40,9 +41,9 @@ slapp
     .message('^(config)$', ['direct_mention', 'direct_message'], (msg) =>{
         AwsModule.getSlackTeamDataFromMsg(msg,function (err,data){
             if (err) {
+                msg.say("Oh, Something went wrong!");
                 console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
             } else {
-                console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
                 if( _.isEmpty(data)){
                     msg
                         .say('Okay, lets begin. What it your teamwork desk team name?')
@@ -118,7 +119,16 @@ slapp
         state.deskApiKey = text;
         msg
             .say(`Here is what I trying to use to connect with : \`\`\`${JSON.stringify(state)}\`\`\``);
-        AwsModule.CreateTeam(msg,state)
+        TeamWorkDesk.testConnectivity(state.deskTeamName,state.deskApiKey, function (status,data) {
+            if(status==200){
+                msg.say("Connection to TeamWork Desk successful");
+                AwsModule.CreateTeam(msg,state)
+
+            } else {
+                msg.say("Connection Failed with error '" + data + "'")
+            }
+
+        });
     });
 // "Conversation" flow that tracks state - kicks off when user says hi, hello or hey
 slapp
