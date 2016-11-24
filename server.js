@@ -5,7 +5,7 @@ const Slapp = require('slapp');
 const ConvoStore = require('slapp-convo-beepboop');
 const Context = require('slapp-context-beepboop');
 const AwsModule = require('./libs/AwsDynamicDb.js');
-
+const _ = require('lodash');
 // use `PORT` env var on Beep Boop - default to 3000 locally
 let port = process.env.PORT || 3000;
 
@@ -38,9 +38,24 @@ slapp.message('help', ['mention', 'direct_message'], (msg) => {
 // Configure
 slapp
     .message('^(config)$', ['direct_mention', 'direct_message'], (msg) =>{
-    msg
-        .say('Okay, lets begin. What it your teamwork desk team name?')
-        .route('set-team-name')
+        AwsModule.getSlackTeamDataFromMsg(msg,function (err,data){
+            if (err) {
+                console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
+            } else {
+                console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
+                if( _.isEmpty(data)){
+                    msg
+                        .say('Okay, lets begin. What it your teamwork desk team name?')
+                        .route('set-team-name')
+
+                }else {
+                    msg
+                        .say('It appears your team is already configured as '  + data.Item.data.deskTeamName )
+                        .route('set-team-name')
+                }
+            }
+
+        });
 })
     .route('set-team-name',(msg,state) => {
         let text = (msg.body.event && msg.body.event.text) || '';
