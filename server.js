@@ -49,14 +49,47 @@ slapp
                         .route('set-team-name')
 
                 }else {
-                    msg
-                        .say('It appears your team is already configured as '  + data.Item.data.deskTeamName )
-                        .route('set-team-name')
+                    msg.say({
+                        text: 'It appears your have already configured your Teamwork Desk team name as ' + data.Item.data.deskTeamName,
+                        "attachments": [
+                            {
+                                "text": "Would you like to change this configuration?",
+                                "fallback": "Unable to change",
+                                "callback_id": "changeTeamConfirm",
+                                "color": "#3AA3E3",
+                                "attachment_type": "default",
+                                "actions": [
+                                    {
+                                        "name": "answer",
+                                        "text": "Yes",
+                                        "type": "button",
+                                        "value": "yes"
+                                    },
+                                    {
+                                        "name": "answer",
+                                        "text": "No",
+                                        "type": "button",
+                                        "value": "no"
+                                    }
+                                ]
+                            }
+                        ]
+                    })
                 }
             }
 
         });
 })
+    .action('changeTeamConfirm','answer',(msg,value) =>{
+        if (value == 'yes'){
+            msg
+                .say('Okay, lets begin. What it your teamwork desk team name?')
+                .route('set-team-name')
+        } else {
+            msg
+                .respond('Configuration change cancelled.')
+        }
+    })
     .route('set-team-name',(msg,state) => {
         let text = (msg.body.event && msg.body.event.text) || '';
 
@@ -87,7 +120,6 @@ slapp
             .say(`Here is what I trying to use to connect with : \`\`\`${JSON.stringify(state)}\`\`\``);
         AwsModule.CreateTeam(msg,state)
     });
-
 // "Conversation" flow that tracks state - kicks off when user says hi, hello or hey
 slapp
   .message('^(hi|hello|hey)$', ['direct_mention', 'direct_message'], (msg, text) => {
